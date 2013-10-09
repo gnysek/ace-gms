@@ -46,3 +46,9 @@ echo '<td>' . implode('|'.PHP_EOL, $constant) . '</td>';
 echo '<td>' . implode('|'.PHP_EOL, $readonly) . '</td>';
 echo '<td>' . implode('|'.PHP_EOL, $obsolete) . '</td>';
 echo '</tr></table>';
+
+file_put_contents('vars.txt', implode(PHP_EOL, $var));
+file_put_contents('function.txt', implode(PHP_EOL, $function));
+file_put_contents('constant.txt', implode(PHP_EOL, $constant));
+file_put_contents('readonly.txt', implode(PHP_EOL, $readonly));
+file_put_contents('obsolete.txt', implode(PHP_EOL, $obsolete));
