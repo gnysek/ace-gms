@@ -1,0 +1,173 @@
+define(function(require, exports, module) {
+"use strict";
+
+var oop = require("../lib/oop");
+var lang = require("../lib/lang");
+var DocCommentHighlightRules = require("./doc_comment_highlight_rules").DocCommentHighlightRules;
+var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+
+var GmlLangHighlightRules = function() {
+    var docComment = DocCommentHighlightRules;
+    
+    
+    var builtinFunctions = lang.arrayToMap(
+        ('%s').split('| ')
+    );
+
+    var keywords = lang.arrayToMap(
+        ('if|then|else|and|or|while|do|for|switch|case|until|div|mod').split('|')
+    );
+
+    var languageConstructs = lang.arrayToMap(
+        ('repeat|break|continue|exit|return|var|globalvar|with').split('|')
+    );
+
+    var builtinConstants = lang.arrayToMap(
+        ('%s').split('| ')
+    );
+
+    var builtinVariables = lang.arrayToMap(
+        ('%s').split('| ')
+    );
+    
+	var builtinVariablesReadOnly = lang.arrayToMap(
+		('%s').split('| ')
+	);
+
+    var builtinFunctionsDeprecated = lang.arrayToMap(
+        ('%s').split('| ')
+    );
+
+    var futureReserved = lang.arrayToMap([]);
+
+    // regexp must not have capturing parentheses. Use (?:) instead.
+    // regexps are ordered -> the first match is used
+    this.$rules = {
+        "start" : [
+            {
+                token : "comment",
+                regex : "\\/\\/.*$"
+            },
+            /*{
+               token : "comment",
+               regex : "#.*$"
+            },
+            //docComment.getStartRule("doc-start"),
+            ,*/{
+                token : "comment", // multi line comment
+                regex : "\\/\\*",
+                next : "comment"
+            }, {
+                token : "string.regexp",
+                regex : "[/](?:(?:\\[(?:\\\\]|[^\\]])+\\])|(?:\\\\/|[^\\]/]))*[/][gimy]*\\s*(?=[).,;]|$)"
+            }, {
+                token : "string", // " string start
+                regex : '"',
+                next : "qqstring"
+            }, {
+                token : "string", // ' string start
+                regex : "'",
+                next : "qstring"
+            }, {
+                token : "constant.numeric", // hex
+                regex : "\\$[0-9a-fA-F]+\\b"
+            }, /*{
+                token: "constant.language",
+                regex: "\\b(?:c_(?:white|red|orange)|fa_(?:left|right|middle|bottom))\\b"
+            
+            },/*{
+                token : "constant.numeric", // float
+                regex : "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b"
+            },*/ {
+                token : function(value) {
+                    if (keywords.hasOwnProperty(value))
+                        return "keyword";
+                    else if (languageConstructs.hasOwnProperty(value))
+                        return "keyword";
+                    else if (builtinConstants.hasOwnProperty(value))
+                        return "constant.language";
+                    else if (builtinVariables.hasOwnProperty(value))
+                        return "variable.language";
+					else if (builtinVariablesReadOnly.hasOwnProperty(value))
+                        return "variable.language";
+                    //else if (futureReserved.hasOwnProperty(value))
+                    //    return "invalid.illegal";
+                    else if (builtinFunctions.hasOwnProperty(value))
+                        return "support.function";
+                    else if (builtinFunctionsDeprecated.hasOwnProperty(value))
+                        return "invalid.deprecated";
+                    /*else
+                        //if(value.match(/^(\$[a-zA-Z][a-zA-Z0-9_]*|self|parent)$/))
+                        if(value.match(/^([a-zA-Z][a-zA-Z0-9_]*)$/))
+                            return "variable";*/
+                        return "identifier";
+                },
+                // [orig comments from PHP]
+                // TODO: Unicode escape sequences
+                // TODO: Unicode identifiers
+                regex : "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
+            },{
+                token : "keyword.operator",
+                regex : "!|\\$|%s|&|\\*|\\-\\-|\\-|\\+\\+|\\+|~|==|=|!=|!==|<=|>=|<<=|>>=|>>>=|<>|<|>|!|&&|\\|\\||\\?\\:|\\*=|%s=|\\+=|\\-=|&=|\\^=|\\b(?:asdf)"
+            }, {
+                token : "lparen",
+                regex : "[[({]"
+            }, {
+                token : "rparen",
+                regex : "[\\])}]"
+            }, {
+                token : "text",
+                regex : "\\s+"
+            }
+        ],
+        "comment" : [
+            {
+                token : "comment", // closing comment
+                regex : ".*?\\*\\/",
+                next : "start"
+            }, {
+                token : "comment", // comment spanning whole line
+                regex : ".+"
+            }
+        ],
+        "qqstring" : [
+            /*{
+                token : "constant.language.escape",
+                regex : '\\\\(?:[nrtvef\\\\"$]|[0-7]{1,3}|x[0-9A-Fa-f]{1,2})'
+            }, {
+                token : "constant.language.escape",
+                regex : /\$[\w\d]+(?:\[[\w\d]+\])?/
+            }, {
+                token : "constant.language.escape",
+                regex : /\$\{[^"\}]+\}?/           // this is wrong but ok for now
+            }, */{
+                token : "string",
+                regex : '"',
+                next : "start"
+            }, {
+                token : "string",
+                regex : '.+?'
+            }
+        ],
+        "qstring" : [
+            /*{
+                token : "constant.language.escape",
+                regex : "\\\\['\\\\]"
+            }, */{
+                token : "string",
+                regex : "'",
+                next : "start"
+            }, {
+                token : "string",
+                regex : ".+?"
+            }
+        ]
+    };
+
+    this.embedRules(DocCommentHighlightRules, "doc-",
+        [ DocCommentHighlightRules.getEndRule("start") ]);
+};
+
+oop.inherits(GmlLangHighlightRules, TextHighlightRules);
+exports.GmlLangHighlightRules = GmlLangHighlightRules;
+});

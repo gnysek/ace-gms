@@ -33,6 +33,12 @@ foreach ($file as $k => $v) {
 	}
 }
 
+$vars = implode('| ', $var);
+$functions = implode('| ', $function);
+$constants = implode('| ', $constant);
+$readonlys = implode('| ', $readonly);
+$obsoletes = implode('| ', $obsolete);
+
 echo '<table><tr>';
 echo '<th>VARS</th>';
 echo '<th>FUNC</th>';
@@ -40,11 +46,11 @@ echo '<th>CONST</th>';
 echo '<th>R-ONLY</th>';
 echo '<th>DEPR</th>';
 echo '</tr><tr>';
-echo '<td>' . implode('|'.PHP_EOL, $var) . '</td>';
-echo '<td>' . implode('|'.PHP_EOL, $function) . '</td>';
-echo '<td>' . implode('|'.PHP_EOL, $constant) . '</td>';
-echo '<td>' . implode('|'.PHP_EOL, $readonly) . '</td>';
-echo '<td>' . implode('|'.PHP_EOL, $obsolete) . '</td>';
+echo '<td>' . str_replace('|', '|' . PHP_EOL, $vars) . '</td>';
+echo '<td>' . str_replace('|', '|' . PHP_EOL, $functions). '</td>';
+echo '<td>' . str_replace('|', '|' . PHP_EOL, $constants) . '</td>';
+echo '<td>' . str_replace('|', '|' . PHP_EOL, $readonlys) . '</td>';
+echo '<td>' . str_replace('|', '|' . PHP_EOL, $obsoletes) . '</td>';
 echo '</tr></table>';
 
 file_put_contents('vars.txt', implode(PHP_EOL, $var));
@@ -52,3 +58,11 @@ file_put_contents('function.txt', implode(PHP_EOL, $function));
 file_put_contents('constant.txt', implode(PHP_EOL, $constant));
 file_put_contents('readonly.txt', implode(PHP_EOL, $readonly));
 file_put_contents('obsolete.txt', implode(PHP_EOL, $obsolete));
+
+/*****************************************************************************/
+
+$buildItAll = file_get_contents('sample-ace.txt');
+
+$buildItAll = sprintf($buildItAll, $functions, $constants, $vars, $readonlys, $obsoletes, '%', '%');
+
+file_put_contents('ace-gml.js', $buildItAll);
