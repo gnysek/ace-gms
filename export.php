@@ -33,11 +33,11 @@ foreach ($file as $k => $v) {
 	}
 }
 
-$vars = implode('| ', $var);
-$functions = implode('| ', $function);
-$constants = implode('| ', $constant);
-$readonlys = implode('| ', $readonly);
-$obsoletes = implode('| ', $obsolete);
+$vars = implode('|', $var);
+$functions = implode('|', $function);
+$constants = implode('|', $constant);
+$readonlys = implode('|', $readonly);
+$obsoletes = implode('|', $obsolete);
 
 echo '<table><tr>';
 echo '<th>VARS</th>';
